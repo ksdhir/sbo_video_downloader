@@ -1,4 +1,4 @@
-"use strict";
+ "use strict";
 console.log("Chrome extension go?");
 
 function readPage() {
@@ -56,25 +56,36 @@ function readPage() {
 }
 // listen for the message on runtime
 
-chrome.runtime.onMessage.addListener(gotMessage);
 
-function gotMessage(message, sender, sendResponse) {
-  if(message.for === "content.js") {
-    console.log(message);
-    console.log(sender)
-    console.log(sendResponse);
-  }
-}
 
 // listening stops here
 
+// readPage is only for the course
 if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0) {
   
   let data = readPage();
 
 
   if(data != undefined) {
+
+
+    
     // console.log(data);
+
+    chrome.runtime.onMessage.addListener(gotMessage);
+
+    function gotMessage(message, sender, sendResponse) {
+      
+      
+
+      if (message.for === "content.js" && message.msg == "coursename") {
+        sendResponse(data.course_name);
+      }
+    }
+
+
+
+
   } else {
     console.warn("couldn't process the data try reloading the page");
     //setTimeout(function(){},5000);
