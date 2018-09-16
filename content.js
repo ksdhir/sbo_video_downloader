@@ -68,27 +68,33 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0) {
 
   if(data != undefined) {
 
+    // check is the session data exists
+    if(sessionStorage.getItem('sbo-dwn')) {
 
-    
+      // check if its same or not
+      // if it's not the same with current data then append it
+      if(JSON.stringify(data) != sessionStorage.getItem('sbo-dwn')){
+        sessionStorage.setItem('sbo-dwn',JSON.stringify(data));
+      };
+
+
+    } else { // when it doesn't then add it
+      sessionStorage.setItem('sbo-dwn',JSON.stringify(data));
+    };
+
     // console.log(data);
 
     chrome.runtime.onMessage.addListener(gotMessage);
 
     function gotMessage(message, sender, sendResponse) {
       
-      
-
       if (message.for === "content.js" && message.msg == "coursename") {
-        sendResponse(data.course_name);
+        sendResponse(JSON.parse(sessionStorage.getItem('sbo-dwn')).course_name);
       }
     }
 
-
-
-
   } else {
     console.warn("couldn't process the data try reloading the page");
-    //setTimeout(function(){},5000);
   };
 
 }

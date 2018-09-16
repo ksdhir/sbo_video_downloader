@@ -50,11 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
               chrome.tabs.sendMessage(tab[0].id, { for: 'content.js', msg: "coursename" }, 
                 // add the course name to the popup html
               function (coursename) {
-                
-                alert(coursename)
 
                 $("#course-name").text(coursename);
-                return;
                 (coursename) ? $("#course-name").text(coursename) : $("#course-name").text(url.href.split("/")[4]);                
               });
 
