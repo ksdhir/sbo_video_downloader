@@ -1,0 +1,113 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/bootstrap-select.min.css">
+    <script src="lib/jquery.js"></script>
+    <script src="lib/popper.min.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/bootstrap-select.min.js"></script>
+
+    <style media="screen">
+      html {
+        height: 300px;
+      }
+      body {
+        width: 500px;
+        height: 300px;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .content {
+        width:460px;
+        /* margin-left: 20px; */
+        margin: 20px auto;
+      }
+
+      label {
+        margin-top: 20px;
+        margin-left: -15px;
+      }
+      .row {
+        background: #f8f9fa;
+        border: 1px grey solid; 
+      }
+      
+      .bs-placeholder, .dropdown-toggle {
+        height: 38px;
+        border: 1px #d3d3d3 solid;
+      }
+
+      .filter-option, .dropdown-item {
+        font-size: 12px;
+      }
+      
+      .name {
+        margin: 10px;
+      }
+      .detail , button {
+        padding: 10px;
+      }
+
+      .hide {
+        display: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <div class="container">
+
+        <!-- The component of download current page video -->
+        <label for="dwn-video"><h6>Download Video:</h6></label>
+
+        <div id='dwn-video' class="row">
+          <!-- The name of the video to be downloaded -->
+          <div id='vid-name' class="col-4 detail name">Processing video name</div>
+          <!-- The resolutions drop down list -->
+          <div class="col-5 detail">
+            <select id="video-drpdwn" class="selectpicker form-control form-select-sm" multiple disabled>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+            </select>
+          </div>
+          
+          <!-- The download button -->
+          <div class="col-2 detail">
+            <button type="button" id='dwn-video-btn' class="btn btn-secondary btn-sm" disabled>Download</button>
+          </div>
+        </div>
+       
+        
+        <!-- The component to download the whole course @safaribooksonline -->
+
+        <!-- To Do: put the course div into a section and only show it when the user is on safaribooks -->
+
+        <label for="dwn-course"><h6>Download Course:</h6></label>
+        <div id='dwn-course' class="row">
+
+          <!-- The name of the course to be downloaded -->
+          <div class="col-4 detail name">Processing Course name</div>
+          <!-- The resolutions drop down list -->
+          <div class="col-5 detail">            
+            <select id="course-drpdwn" class="selectpicker form-control form-select-sm" disabled>
+              <option value="" selected disabled>Processing...</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </div>
+          <div class="col-2 detail">
+          <!-- The download button -->
+          <button type="button" id='dwn-course-btn' class="btn btn-secondary btn-sm" disabled>Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<script src="lib/script.js"></script>
+<script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+  "name": "Safari Books Course and Video Downloader",
+  "version": "0.5",
+  
+  "content_scripts": [
+    {
+      "run_at": "document_idle",
+      "matches": [
+        "*://*.safaribooksonline.com/*"
+      ],
+      "js": [
+        "lib/jquery.js",
+        "content.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "downloads",
+    "storage",
+    "*://*.safaribooksonline.com/"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Video downloader for SafariBooksOnline"
+  }
+}
