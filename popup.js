@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   $(document).ready(function(){
+
     $('select').selectpicker({
       noneSelectedText: 'Processing...'
     }); 
@@ -42,19 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
           // ask content.js for the data variable
 
           (function(){
-            chrome.tabs.query({
-              active: true,
-              currentWindow: true
-            }, function (tab) {
 
-              chrome.tabs.sendMessage(tab[0].id, { for: 'content.js', msg: "coursename" }, 
-                // add the course name to the popup html
-              function (coursename) {
-
-                $("#course-name").text(coursename);
-                (coursename) ? $("#course-name").text(coursename) : $("#course-name").text(url.href.split("/")[4]);                
-              });
-
+            chrome.storage.local.get(/* String or Array */["sbo-dwn"], function (items) {
+              let coursename = JSON.parse(items["sbo-dwn"]).course_name;
+              (coursename) ? $("#course-name").text(coursename) : 
+                $("#course-name").text(url.href.split("/")[4]);
             });
 
             // enable the dropdown select option list for the course
@@ -112,6 +105,17 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault(); // Prevent the default action
 
         console.log($('#course-drpdwn').find("option:selected")[0].value);
+
+        var port = chrome.runtime.connect({
+          name: "Download Videos/Course"
+        });
+
+        port.postMessage({ type: 'course'});
+        
+        port.onMessage.addListener(function (msg) {
+          // console.log("From Background.js: " + msg);
+          alert(msg);
+        });
 
       });
 

@@ -65,33 +65,23 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0) {
   
   let data = readPage();
 
+  console.log(data);
 
   if(data != undefined) {
 
-    // check is the session data exists
-    if(sessionStorage.getItem('sbo-dwn')) {
-
-      // check if its same or not
-      // if it's not the same with current data then append it
-      if(JSON.stringify(data) != sessionStorage.getItem('sbo-dwn')){
-        sessionStorage.setItem('sbo-dwn',JSON.stringify(data));
-      };
 
 
-    } else { // when it doesn't then add it
-      sessionStorage.setItem('sbo-dwn',JSON.stringify(data));
-    };
 
-    // console.log(data);
 
-    chrome.runtime.onMessage.addListener(gotMessage);
-
-    function gotMessage(message, sender, sendResponse) {
-      
-      if (message.for === "content.js" && message.msg == "coursename") {
-        sendResponse(JSON.parse(sessionStorage.getItem('sbo-dwn')).course_name);
+    // set the data variable if the session doesn't exist
+    // or if the course page has changed
+    chrome.storage.local.get(['sbo-dwn'], function (sbodata) {
+      if (sbodata["sbo-dwn"] == undefined || JSON.stringify(data) != sbodata["sbo-dwn"]) {
+        chrome.storage.local.set({ "sbo-dwn": JSON.stringify(data) }, function () {
+          return true;
+        })
       }
-    }
+    });
 
   } else {
     console.warn("couldn't process the data try reloading the page");
