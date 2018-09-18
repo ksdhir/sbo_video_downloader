@@ -22,7 +22,14 @@ function readPage() {
       console.warn("The DOM has changed!");
       return;
     }
-    
+
+    // get the course url
+    let courseUrl = window.location.href.split('/').slice(0, 5).join('/');
+  
+
+    // add the course url
+    data.course_url = courseUrl;
+  
     // add the url
     data.url = "https://safaribooksonline.com";
 
@@ -61,30 +68,31 @@ function readPage() {
 // listening stops here
 
 // readPage is only for the course
-if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0) {
-  
-  let data = readPage();
+if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window.location.href.split('/').length > 6) {
 
-  console.log(data);
+    console.log("in here");
 
-  if(data != undefined) {
+  // set the data variable if the variable doesn't exist
+  // or if the course url has changed
+  chrome.storage.local.get(['sbo-dwn'], function (sbodata) {
+    let courseUrl = window.location.href.split('/').slice(0, 5).join('/');
+    
+    
+    if (sbodata["sbo-dwn"] == undefined || JSON.parse(sbodata['sbo-dwn'])['course_url'] != courseUrl) {
+      console.log("update kia");
 
-
-
-
-
-    // set the data variable if the session doesn't exist
-    // or if the course page has changed
-    chrome.storage.local.get(['sbo-dwn'], function (sbodata) {
-      if (sbodata["sbo-dwn"] == undefined || JSON.stringify(data) != sbodata["sbo-dwn"]) {
+      let data = readPage();
+      if(data != undefined) {
         chrome.storage.local.set({ "sbo-dwn": JSON.stringify(data) }, function () {
           return true;
         })
+      } else {
+        console.error("Could not process the page, please try reloading!")
       }
-    });
 
-  } else {
-    console.warn("couldn't process the data try reloading the page");
-  };
+    }
+  });
+
+
 
 }
