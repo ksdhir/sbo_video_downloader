@@ -78,7 +78,7 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window
     let courseUrl = window.location.href.split('/').slice(0, 5).join('/');
     
     
-    if (sbodata["sbo-dwn"] == undefined || JSON.parse(sbodata['sbo-dwn'])['course_url'] != courseUrl) {
+    if (Object.keys(sbodata).length == 0 || JSON.parse(sbodata['sbo-dwn'])['course_url'] != courseUrl) {
       console.log("update kia");
 
       let data = readPage();

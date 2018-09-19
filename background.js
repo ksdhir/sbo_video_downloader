@@ -23,6 +23,8 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 function downloadVideos(url,name) {
 
+  let name = name.replace(/[|&;$%@?"*<>+]/g, "");
+  
   chrome.downloads.download({
     url: url,
     filename: name, // Optional
