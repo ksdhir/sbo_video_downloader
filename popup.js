@@ -17,30 +17,51 @@ document.addEventListener('DOMContentLoaded', function() {
         let coursePage = url.pathname.match('/([0-9]+)/?');
 
         if (coursePage) {
-          // run the ajax function to process everything
+          
+          chrome.storage.local.get(['sbo-popup'],function(obj){
 
 
+            // if the obj is empty or the url of the video is different then
+            // add the data to select and run ajax
 
-          // var port = chrome.runtime.connect({ name: "data transfer" });
-          // port.postMessage({ link: url.href });
-          // port.onMessage.addListener(function (msg) {
-          //   console.log(msg);
-          // });
+            // TODO: Save the course name and the selection option values and url
+            // and save it in the popup node
+            // so that the popup page doesn't run ajax again if the user is on the same page
+          
+            if(Object.keys(obj).length == 1 || JSON.parse(obj['sbo-popup'])['video_url'] != url.href) {
+
+              // run ajax 
+              fetchVideoContents.runAjax(url.href);
+
+              // the course name
+              // the course urls - selection options
+              // button activation 
+
+              // set the variables
+              chrome.storage.local.set({'sbo-popup': JSON.stringify({ 'popup_node': "", 'video_url': url.href})}, function(){return false;});
+
+              console.log("changes saved");
+            } else {
+
+              // append to the dom from the get variable
+              let popObj = JSON.parse(obj['sbo-popup']);
+             // console.log(popObj['popup_node']);
+              //popObj['popup_node'].appendTo("#main");
+              $("#main").html(popObj['popup_node']);
 
 
+              //$('#video-drpdwn').selectpicker('refresh');
+              //$('#course-drpdwn').selectpicker('refresh');
 
+            };
 
+          });
 
-
-
-
-
-
-
-          fetchVideoContents.runAjax(url.href);
+          
 
 
           // ask content.js for the data variable
+          // to append the Course name and activate the button
 
           (function(){
 
