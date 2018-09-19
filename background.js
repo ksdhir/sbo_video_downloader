@@ -10,8 +10,11 @@ chrome.runtime.onConnect.addListener(function (port) {
       }
     } else if (msg.type = 'course') {
       
-      
+      //port.postMessage(msg.course_id);
       port.postMessage("Did you just asked me to download the whole course?");
+
+
+      courseDownloader(msg.course_id);
 
     };
 
@@ -21,13 +24,47 @@ chrome.runtime.onConnect.addListener(function (port) {
 });
 
 
-function downloadVideos(url,name) {
-
-  let name = name.replace(/[|&;$%@?"*<>+]/g, "");
+function courseDownloader(resId) {
   
+  chrome.storage.local.get(['sbo-dwn'], function (obj) {
+    let courseHost = JSON.parse(obj['sbo-dwn']).url;
+    let courseLinks = JSON.parse(obj['sbo-dwn']).links;
+    let courseName = JSON.parse(obj['sbo-dwn']).course_name;
+
+    for (let chapterName in courseLinks) {
+      //console.log(chapterName)
+      
+      courseLinks[chapterName].forEach(function (rawLink,id) {
+        
+        let idx = (id.toString()).padStart(3, '0')+"_";
+        
+        let name = courseName + "/" + chapterName + "/" + idx;
+        let rawURL = courseHost + rawLink;
+        //console.log(name)
+        fetchVideoContents.runAjax(rawURL,resId,name);
+
+      })
+    };
+
+  });
+   
+  
+
+
+
+};
+
+
+function downloadVideos(url,urlname) {
+  console.log('hit it');
+  console.log(url);
+  console.log(urlname);
+  let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
+  
+
   chrome.downloads.download({
     url: url,
-    filename: name, // Optional
+    filename: filename, // Optional
     saveAs: false
   });
 
@@ -37,7 +74,8 @@ function downloadVideos(url,name) {
 
 
 var fetchVideoContents = {
-  type: "",
+  name: "",
+  resId: "",
   useQuery: function (a, b) {
     var c = a.includes("?");
     if ("string" == typeof b) return a + (c ? "&" : "?") + b;
@@ -51,9 +89,14 @@ var fetchVideoContents = {
     return fetchURL;
   },
 
-  runAjax: function (currentURL, button) {
+  runAjax: function (currentURL, resId, name) {
 
-    this.type = button;
+    this.resId = resId;
+    this.name = name;
+    
+    
+    //console.log(name);
+    //return;
     let val = this.prepareURL(currentURL);
     // console.log(val);
 
@@ -61,13 +104,14 @@ var fetchVideoContents = {
       type: "GET",
       dataType: "json",
       url: val,
-      async: false,
+      async: true,
       success: handleRequestSuccess.bind(this),
       error: function () { console.log('error!') }
     });
 
 
     function handleRequestSuccess(a) {
+      
       if (a.data === null) {
         console.error("Video could not be processed");
         return;
@@ -98,8 +142,9 @@ var fetchVideoContents = {
     }
     // call the prepareData function
     this.prepareData(b);
-    // call the renderWinData to make the table
-    this.renderWinData(b);
+    // call the downloadVids to start the downloads
+    this.downloadVids(b);
+    
   },
 
   prepareData: function (a) {
@@ -166,23 +211,30 @@ var fetchVideoContents = {
   },
 
 
-  renderWinData: function (c) {
+  downloadVids: function (c) {
 
 
-    console.log(c);
+    let genFromat = c[0].formats[this.resId];
+    
+    if(!genFromat) {
+      genFromat = c[0].formats[c[0].formats.length];
+    };
+
+
+    // download the files
+    let downloadName = this.name + genFromat.downloadName;
+    let downloadUrl = genFromat.url;
+    
+   
+
+
+    downloadVideos(downloadUrl,downloadName);
+    
+
 
     return;
 
-    if (this.type == "course") {
-      // don't need to render anything
-      // continue the process with downloading the whole course
-
-      // call the function to download
-
-
-
-      return;
-    };
+    
     //console.log(c);
     // i dunno how to use this shit
     //var d = c[0].webpage_url

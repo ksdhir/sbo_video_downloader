@@ -125,13 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
       $("#dwn-course-btn").on('click',function(event){
         event.preventDefault(); // Prevent the default action
 
-        console.log($('#course-drpdwn').find("option:selected")[0].value);
-
+        //console.log($('#course-drpdwn').find("option:selected")[0].value);
+        var courseResId = $('#course-drpdwn').find("option:selected")[0].getAttribute('data-idx');
+        
         var port = chrome.runtime.connect({
           name: "Download Videos/Course"
         });
 
-        port.postMessage({ type: 'course'});
+        port.postMessage({ type: 'course', course_id: courseResId});
         
         port.onMessage.addListener(function (msg) {
           // console.log("From Background.js: " + msg);

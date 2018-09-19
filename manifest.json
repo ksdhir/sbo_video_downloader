@@ -17,6 +17,7 @@
   ],
   "background": {
     "scripts": [
+      "lib/jquery.js",
       "background.js"
     ]
   },

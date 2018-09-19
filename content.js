@@ -72,14 +72,32 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window
 
     console.log("in here");
 
+
+    // IMP!!
+
+    // TODO store the readpage contents in the localhost
+    // as when the browser reloads 
+    // the contents of the chrome.storage.local reset
+
+
+
+
+
   // set the data variable if the variable doesn't exist
   // or if the course url has changed
   chrome.storage.local.get(['sbo-dwn'], function (sbodata) {
+    console.log("hey");
+    
     let courseUrl = window.location.href.split('/').slice(0, 5).join('/');
     
-    
-    if (Object.keys(sbodata).length == 0 || JSON.parse(sbodata['sbo-dwn'])['course_url'] != courseUrl) {
-      console.log("update kia");
+    /*
+    if (sbodata['sbo-data'] == undefined) {
+      console.log("run please :/")
+    }
+    */
+    //return;
+    if ((sbodata['sbo-data']) == undefined || Object.keys(sbodata).length == 0 || JSON.parse(sbodata['sbo-dwn'])['course_url'] != courseUrl) {
+      console.log("updated the sbo data");
 
       let data = readPage();
       if(data != undefined) {
