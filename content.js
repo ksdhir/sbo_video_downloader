@@ -68,28 +68,41 @@ function readPage() {
 // listening stops here
 
 // readPage is only for the course
-if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window.location.href.split('/').length > 6) {
-
-    console.log("in here");
+if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0) {
 
 
-    // IMP!!
+  safariCourse();
 
-    // TODO store the readpage contents in the localhost
-    // as when the browser reloads 
-    // the contents of the chrome.storage.local reset
+  document.addEventListener('click',function(e){
+    if(e.target.tagName == "A"){
+      safariCourse();
+    }
+  });
+
+}
+
+function safariCourse(){
+
+  // if its not a video link
+  if(window.location.href.split('/').length <= 6){
+    return;
+  }
 
 
+  // IMP!!
+
+  // TODO store the readpage contents in the localhost
+  // as when the browser reloads 
+  // the contents of the chrome.storage.local reset
+  // just a theory check if thats true or not
 
 
 
   // set the data variable if the variable doesn't exist
   // or if the course url has changed
   chrome.storage.local.get(['sbo-dwn'], function (sbodata) {
-    console.log("hey");
-    
     let courseUrl = window.location.href.split('/').slice(0, 5).join('/');
-    
+
     /*
     if (sbodata['sbo-data'] == undefined) {
       console.log("run please :/")
@@ -100,7 +113,7 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window
       console.log("updated the sbo data");
 
       let data = readPage();
-      if(data != undefined) {
+      if (data != undefined) {
         chrome.storage.local.set({ "sbo-dwn": JSON.stringify(data) }, function () {
           return true;
         })
@@ -111,6 +124,4 @@ if (window.location.hostname.indexOf('www.safaribooksonline.com') >= 0 && window
     }
   });
 
-
-
-}
+};

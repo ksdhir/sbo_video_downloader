@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // TODO: Save the course name and the selection option values and url
             // and save it in the popup node
             // so that the popup page doesn't run ajax again if the user is on the same page
-          
-            if(Object.keys(obj).length == 1 || JSON.parse(obj['sbo-popup'])['video_url'] != url.href) {
-
+            
+            
+            if ((obj['sbo-popup']) == undefined || Object.keys(obj).length == 1 || JSON.parse(obj['sbo-popup'])['video_url'] != url.href) {
               // run ajax 
               fetchVideoContents.runAjax(url.href);
 

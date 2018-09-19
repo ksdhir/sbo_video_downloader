@@ -58,15 +58,31 @@ function courseDownloader(resId) {
 function downloadVideos(url,urlname) {
   console.log('hit it');
   console.log(url);
-  console.log(urlname);
-  let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
-  
 
-  chrome.downloads.download({
-    url: url,
-    filename: filename, // Optional
-    saveAs: false
-  });
+  testRedirect(url);
+  
+  function testRedirect(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function (e) {
+      if (xhr.status == 200 && xhr.readyState == 4) {
+        if (url != xhr.responseURL) {
+          //alert("redirect detected to: " + xhr.responseURL)
+          let finalUrl = xhr.responseURL.slice(0, -1 * '/clipTo/60000/name/a.mp4'.length);
+          let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
+
+
+          chrome.downloads.download({
+            url: finalUrl,
+            filename: filename, // Optional
+            saveAs: false
+          });
+
+        };
+      }
+    }
+    xhr.open("GET", url, false);
+    xhr.send();
+  }
 
 };
 
@@ -104,7 +120,7 @@ var fetchVideoContents = {
       type: "GET",
       dataType: "json",
       url: val,
-      async: true,
+      async: false,
       success: handleRequestSuccess.bind(this),
       error: function () { console.log('error!') }
     });
