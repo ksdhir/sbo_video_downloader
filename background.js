@@ -6,7 +6,7 @@ chrome.runtime.onConnect.addListener(function (port) {
       
       let links = msg.data;
       for (var key in links) {
-        downloadVideos(links[key][0],links[key][1]);
+        downloadVideos(links[key][0],links[key][1],msg.site);
       }
     } else if (msg.type = 'course') {
       
@@ -40,7 +40,8 @@ function courseDownloader(resId) {
         
         let name = courseName + "/" + chapterName + "/" + idx;
         let rawURL = courseHost + rawLink;
-        //console.log(name)
+        //console.log(rawURL)
+
         fetchVideoContents.runAjax(rawURL,resId,name);
 
       })
@@ -55,9 +56,20 @@ function courseDownloader(resId) {
 };
 
 
-function downloadVideos(url,urlname) {
+function downloadVideos(url,urlname,site) {
+  let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
   console.log('hit it');
-  console.log(url);
+
+  if(site == 'youtube') {
+
+    chrome.downloads.download({
+      url: url,
+      filename: filename, // Optional
+      saveAs: false
+    });
+
+    return;
+  };
 
   testRedirect(url);
   
@@ -67,8 +79,9 @@ function downloadVideos(url,urlname) {
       if (xhr.status == 200 && xhr.readyState == 4) {
         if (url != xhr.responseURL) {
           //alert("redirect detected to: " + xhr.responseURL)
+          
           let finalUrl = xhr.responseURL.slice(0, -1 * '/clipTo/60000/name/a.mp4'.length);
-          let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
+          
 
 
           chrome.downloads.download({

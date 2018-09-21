@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
       let url = document.createElement('a');
       url.href = tabs[0].url;
 
+      if(url.host == "www.youtube.com") {
+        fetchVideoContents.runAjax(url.href);
+        $("#dwn-video-btn").val('youtube');
+      }
+
       if (url.host == "www.safaribooksonline.com") {
 
         // check if the video page in safari is opened
@@ -96,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
       $("#dwn-video-btn").on('click', function (event) {
         event.preventDefault(); // To prevent following the link (optional)
         
+
         let selectedFormatArray = $.map($("#video-drpdwn").find("option:selected"), function (value, index) {
           return [value];
         });
@@ -111,8 +117,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var port = chrome.runtime.connect({
           name: "Download Videos/Course"
         });
-
-        port.postMessage({ type: 'video', data: selFormatObj });
+        
+        let vidsite = this.value;
+        port.postMessage({ type: 'video', data: selFormatObj, site: vidsite });
         port.onMessage.addListener(function (msg) {
           // console.log("From Background.js: " + msg);
           alert(msg);
