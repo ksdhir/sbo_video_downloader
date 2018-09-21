@@ -31,6 +31,8 @@ function courseDownloader(resId) {
     let courseLinks = JSON.parse(obj['sbo-dwn']).links;
     let courseName = JSON.parse(obj['sbo-dwn']).course_name;
 
+    // add the resolution id in the object
+    fetchVideoContents.resId = resId;
     for (let chapterName in courseLinks) {
       //console.log(chapterName)
       
@@ -39,10 +41,11 @@ function courseDownloader(resId) {
         let idx = (id.toString()).padStart(3, '0')+"_";
         
         let name = courseName + "/" + chapterName + "/" + idx;
+        //console.log(name);
         let rawURL = courseHost + rawLink;
         //console.log(rawURL)
 
-        fetchVideoContents.runAjax(rawURL,resId,name);
+        fetchVideoContents.runAjax(rawURL,name);
 
       })
     };
@@ -57,43 +60,44 @@ function courseDownloader(resId) {
 
 
 function downloadVideos(url,urlname,site) {
-  let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "");
+  let filename = urlname.replace(/[|&:;~$%@?"*<>+]/g, "-");
+
   console.log('hit it');
 
   if(site == 'youtube') {
 
     chrome.downloads.download({
       url: url,
-      filename: filename, // Optional
+      filename: filename,
       saveAs: false
     });
 
     return;
   };
 
-  testRedirect(url);
+  testRedirect(url,filename);
   
-  function testRedirect(url) {
+  function testRedirect(url,filename) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function (e) {
       if (xhr.status == 200 && xhr.readyState == 4) {
         if (url != xhr.responseURL) {
           //alert("redirect detected to: " + xhr.responseURL)
           
-          let finalUrl = xhr.responseURL.slice(0, -1 * '/clipTo/60000/name/a.mp4'.length);
+          let finalUrl = xhr.responseURL.replace("/clipTo/60000/name/a.mp4", "");
           
 
 
           chrome.downloads.download({
             url: finalUrl,
-            filename: filename, // Optional
+            filename: filename,
             saveAs: false
           });
 
         };
       }
     }
-    xhr.open("GET", url, false);
+    xhr.open("GET", url, true);
     xhr.send();
   }
 
@@ -103,7 +107,6 @@ function downloadVideos(url,urlname,site) {
 
 
 var fetchVideoContents = {
-  name: "",
   resId: "",
   useQuery: function (a, b) {
     var c = a.includes("?");
@@ -118,14 +121,8 @@ var fetchVideoContents = {
     return fetchURL;
   },
 
-  runAjax: function (currentURL, resId, name) {
-
-    this.resId = resId;
-    this.name = name;
+  runAjax: function (currentURL, name) {
     
-    
-    //console.log(name);
-    //return;
     let val = this.prepareURL(currentURL);
     // console.log(val);
 
@@ -133,21 +130,24 @@ var fetchVideoContents = {
       type: "GET",
       dataType: "json",
       url: val,
-      async: false,
+      async: true,
       success: handleRequestSuccess.bind(this),
-      error: function () { console.log('error!') }
+      error: function () { 
+        console.log('error!');
+        alert(currentURL+ '<br> can\'t be downloaded');
+      }
     });
 
 
+
     function handleRequestSuccess(a) {
-      
       if (a.data === null) {
         console.error("Video could not be processed");
         return;
       }
       var b = a.data;
       if (b && 1 == a.state) {
-        this.renderData([b])
+        this.renderData([b],name)
         // console.log([b]);
       }
     };
@@ -158,7 +158,7 @@ var fetchVideoContents = {
 
 
   // the render data function
-  renderData: function (b) {
+  renderData: function (b,name) {
     for (var c = b.length - 1; c >= 0; c--) {
       if ("string" == typeof b[c]) {
         try {
@@ -172,7 +172,7 @@ var fetchVideoContents = {
     // call the prepareData function
     this.prepareData(b);
     // call the downloadVids to start the downloads
-    this.downloadVids(b);
+    this.downloadVids(b,name);
     
   },
 
@@ -240,7 +240,7 @@ var fetchVideoContents = {
   },
 
 
-  downloadVids: function (c) {
+  downloadVids: function (c,name) {
 
 
     let genFromat = c[0].formats[this.resId];
@@ -250,11 +250,11 @@ var fetchVideoContents = {
     };
 
 
+
     // download the files
-    let downloadName = this.name + genFromat.downloadName;
+    let downloadName = name + genFromat.downloadName;
     let downloadUrl = genFromat.url;
     
-   
 
 
     downloadVideos(downloadUrl,downloadName);
